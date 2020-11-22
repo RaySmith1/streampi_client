@@ -229,6 +229,14 @@ Complete the following steps to configure kiosk running under user 'pi':
     sudo ln -sf libbrcmEGL.so /opt/vc/lib/libEGL.so
     sudo ln -sf libbrcmGLESv2.so /opt/vc/lib/libGLESv2.so
     ```
+1. Disable StreamPi Client start (not installed yet):
+    ```bash
+    touch ~/noApp
+    ```
+1. Reboot System:
+    ```bash
+    sudo reboot
+    ```
 
 ## Install StreamPi Client
 
