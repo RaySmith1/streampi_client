@@ -240,7 +240,7 @@ Complete the following steps to configure kiosk running under user 'pi':
 
 ## Install StreamPi Client
 
-> **NOTE** This installation bypasses the install and startup script include in the released zip file.  This guide and the .xsession script servers to replace those items.
+> **NOTE** This installation bypasses the StreamPi Client install and startup script include in the released zip file.  This guide and the .xsession script servers to replace those items.
 
 Complete the following steps to install StreamPi Client:
 
