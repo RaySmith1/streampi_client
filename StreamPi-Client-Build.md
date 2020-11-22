@@ -148,12 +148,32 @@ Complete the following steps to configure kiosk running under user 'pi':
     cat <<-EOF > /home/pi/.xsession
     #!/usr/bin/env bash
 
+    function f_startStreamPiClient
+    {
+            # Make sure we have an IP address
+            while [[ -z "$(hostname -I)" ]]; do
+                    echo "Waiting for a network address ..."
+                    sleep 15s
+            done
+
+            # Start StreamPi Client
+            if [[ -f ~/StreamPi/StreamPiClient-0.6.jar && -x ~/StreamPi/jre/bin/java ]]; then
+                    cd ~/StreamPi && {
+                    ~/StreamPi/jre/bin/java \
+                    -Dcom.sun.javafx.isEmbedded=true \
+                    -Dcom.sun.javafx.touch=true \
+                    -Dcom.sun.javafx.virtualKeyboard=javafx \
+                    -jar StreamPiClient-0.6.jar &
+                    }
+            fi
+    }
+
     # Disable Screen Sleep/Blank
     xset s off
     xset -dpms
     xset s noblank
 
-    # Set backup (optional)
+    # Set background (optional)
     if [ -f /home/pi/wallpaper/bg-image ]; then
             feh --bg-center /home/pi/wallpaper/bg-image
     fi
@@ -161,21 +181,34 @@ Complete the following steps to configure kiosk running under user 'pi':
     # Set brightness
     sudo /bin/bash -c '{ echo 255 > /sys/class/backlight/rpi_backlight/brightness; }'
 
-    # Wait to obtain IP address
-    while [[ -z "$(hostname -I)" ]]; do
-            echo "Waiting for a network address ..."
-            sleep 15s
-    done
+    # Pause before starting (allow disable auto-start)
+    xmessage -buttons Disable-StreamPi-Client:101,Start-StreamPi-Client:102 -center -default Start-StreamPi-Client -timeout 15 "Ready to start StreamPi Client. Waiting 15 seconds."
+    case "$?" in
+            101)    touch ~/noApp
+                    ;;
+            102)    # Do Nothing
+                    ;;
+    esac
 
-    # Check for StreamPi & start if possible
-    if [[ -f ~/StreamPi/StreamPiClient-0.6.jar && -x ~/StreamPi/jre/bin/java ]]; then
-            cd ~/StreamPi && {
-            ~/StreamPi/jre/bin/java \
-            -Dcom.sun.javafx.isEmbedded=true \
-            -Dcom.sun.javafx.touch=true \
-            -Dcom.sun.javafx.virtualKeyboard=javafx \
-            -jar StreamPiClient-0.6.jar &
-            }
+    # Start StreamPii Client or show message if disabled.
+    if [ ! -f ~/noApp ]; then
+
+            # StreamPi Client enabled
+            f_startStreamPiClient
+
+    else
+            # StreamPi Client disabled.
+            while true; do
+                    xmessage -buttons Enable-StreamPi-Client:103,Reboot-RaspberryPi:104 -center "StreamPi Client is currently disabled. Press Ctrl+Alt+F1 for TTY login."
+                    case "$?" in
+                            103)    rm ~/noApp
+                                    f_startStreamPiClient
+                                    ;;
+                            104)    sudo reboot
+                                    ;;
+                    esac
+                    sleep 15s
+            done
     fi
 
     # Hide cursor ??
