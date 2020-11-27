@@ -260,7 +260,7 @@ Complete the following steps to install StreamPi Client:
     ```
 1. Create initial configuration:
     ```bash
-     declare -a screen0=($(xrandr -q -d :0 2> /dev/null | sed -n -r 's/.*connected\s([0-9]+)x([0-9]+).*$/\1 \2/p'))
+     declare -a screen0=($(xrandr -q -d :0 2> /dev/null | sed -n -r 's/.*connected\s(|primary\s)([0-9]+)x([0-9]+).*$/\2 \3/p'))
      echo "${screen0[0]}::${screen0[1]}::192.168.0.106::63::test1::1::1::100::15::" > ~/StreamPi/config
     ```
     > **NOTE** IP address (192.168.0.106) and port (63) above can be updated to reflect StreamPi server ip address and port.
